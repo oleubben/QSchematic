@@ -12,7 +12,7 @@ project(
 enable_testing()
 
 # User options
-set(OPTION_BUILD_SHARED_DEFAULT ON)
+set(OPTION_BUILD_SHARED_DEFAULT OFF)
 if (MSVC)
     set(OPTION_BUILD_SHARED_DEFAULT OFF)
 endif()
