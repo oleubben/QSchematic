@@ -65,7 +65,6 @@ function(setup_target_common target)
                 wire_system/wire.hpp
                 wire_system/point.hpp
                 wire_system/net.hpp
-                background.hpp
                 netlist.hpp
                 netlist_writer_json.hpp
                 netlistgenerator.hpp
@@ -103,7 +102,6 @@ function(setup_target_common target)
             wire_system/wire.cpp
             wire_system/point.cpp
             wire_system/net.cpp
-            background.cpp
             scene.cpp
             settings.cpp
             utils.cpp

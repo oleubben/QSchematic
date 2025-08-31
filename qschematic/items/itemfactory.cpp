@@ -1,30 +1,27 @@
 #include "itemfactory.hpp"
-#include "node.hpp"
-#include "wire.hpp"
-#include "wireroundedcorners.hpp"
 #include "bezierwire.hpp"
 #include "connector.hpp"
 #include "label.hpp"
+#include "node.hpp"
+#include "wire.hpp"
+#include "wireroundedcorners.hpp"
 
 using namespace QSchematic::Items;
 
-Factory&
-Factory::instance()
-{
+Factory &Factory::instance() {
     static Factory instance;
 
     return instance;
 }
 
-void
-Factory::setCustomItemsFactory(const std::function<std::shared_ptr<Item>(const gpds::container&)>& factory)
-{
+void Factory::setCustomItemsFactory(
+    const std::function<std::shared_ptr<Item>(const gpds::container &)>
+        &factory) {
     _customItemFactory = factory;
 }
 
 std::shared_ptr<Item>
-Factory::from_container(const gpds::container& container) const
-{
+Factory::from_container(const gpds::container &container) const {
     // First, try custom types
     if (_customItemFactory) {
         if (auto item = _customItemFactory(container); item)
@@ -54,18 +51,14 @@ Factory::from_container(const gpds::container& container) const
     case Item::LabelType:
         return std::make_shared<Label>();
 
-    case Item::BackgroundType:
-        return { };
-
     case Item::QSchematicItemUserType:
         break;
     }
 
-    return { };
+    return {};
 }
 
-Item::ItemType
-Factory::extractType(const gpds::container& container)
-{
-    return static_cast<Item::ItemType>( container.get_attribute<int>( "type-id" ).value_or( -1 ) );
+Item::ItemType Factory::extractType(const gpds::container &container) {
+    return static_cast<Item::ItemType>(
+        container.get_attribute<int>("type-id").value_or(-1));
 }
