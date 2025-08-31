@@ -87,12 +87,12 @@ class View : public QGraphicsView {
 
   private:
     void updateScale();
-
+    void updateSceneRect();
     void setMode(Mode newMode);
 
     Settings _settings;
     qreal _scaleFactor = 1.0;
     Mode _mode = Mode::NormalMode;
-    QPoint _panStart;
+    QPointF _panStart;
 };
 } // namespace QSchematic

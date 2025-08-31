@@ -11,16 +11,16 @@
 using namespace QSchematic;
 
 View::View(QWidget *parent) : QGraphicsView(parent) {
-    // Scroll bars
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     // Interaction stuff
     setMouseTracking(true);
     setAcceptDrops(true);
     setDragMode(QGraphicsView::RubberBandDrag);
 
-    // Rendering options
+    //  Rendering options
     setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
     // Set initial zoom value
@@ -113,7 +113,6 @@ void View::wheelEvent(QWheelEvent *event) {
         updateScale();
     }
 }
-
 void View::mouseMoveEvent(QMouseEvent *event) {
     QGraphicsView::mouseMoveEvent(event);
 
@@ -122,13 +121,13 @@ void View::mouseMoveEvent(QMouseEvent *event) {
         break;
 
     case PanMode:
-        horizontalScrollBar()->setValue(
-            horizontalScrollBar()->value() -
-            (event->position().x() - _panStart.x()));
-        verticalScrollBar()->setValue(verticalScrollBar()->value() -
-                                      (event->position().y() - _panStart.y()));
-        _panStart = event->pos();
+        // Pan Movement
+        auto delta = mapToScene(event->pos()) - mapToScene(_panStart.toPoint());
+        setTransformationAnchor(QGraphicsView::NoAnchor);
+        setTransform(transform().translate(delta.x(), delta.y()));
+        _panStart = event->position();
         event->accept();
+        updateSceneRect();
         return;
     }
 }
@@ -202,9 +201,21 @@ void View::updateScale() {
     float zoom = qExp(logZoom);
 
     // Apply the new scale
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setTransform(QTransform::fromScale(zoom, zoom));
+    updateSceneRect();
     qDebug() << zoom;
     Q_EMIT zoomChanged(zoom);
+}
+
+void QSchematic::View::updateSceneRect() {
+    QRectF rect = mapToScene(viewport()->rect()).boundingRect().toRect();
+    rect = QRectF(rect.x() - 50, rect.y() - 50, rect.width() + 100,
+                  rect.height() + 100);
+    if (!sceneRect().toRect().contains(rect.toRect(), true)) {
+        rect = sceneRect().united(rect);
+        setSceneRect(rect);
+    }
 }
 
 void View::setMode(const Mode newMode) {
